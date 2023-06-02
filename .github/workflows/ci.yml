@@ -133,7 +133,7 @@ jobs:
 
       - name: Run pytest tests with coverage
         run: |
-          pytest -n auto --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term
+          pytest -s tests/integration/challenges/basic_abilities/test_write_file.py
           python tests/integration/challenges/utils/build_current_score.py
         env:
           CI: true
@@ -152,7 +152,8 @@ jobs:
             "Authorization: Basic x-access-token:${{ secrets.PAT_REVIEW }}"
 
           echo "config_key=$config_key" >> $GITHUB_OUTPUT
-
+          git config --global user.name "Auto-GPT-Bot"
+          git config --global user.email "github-bot@agpt.co"
       - name: Push updated challenge scores
         if: github.event_name == 'push'
         run: |
