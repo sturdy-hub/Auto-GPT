@@ -170,6 +170,8 @@ jobs:
       - id: push_cassettes
         name: Push updated cassettes
         run: |
+          git config --global user.name "Auto-GPT-Bot"
+          git config --global user.email "github-bot@agpt.co"
           if [[ "${{ startsWith(github.event_name, 'pull_request') }}" = "true" ]]; then
             is_pull_request=true
             cassette_branch="${{ github.event.pull_request.user.login }}-${{ github.event.pull_request.head.ref }}"
