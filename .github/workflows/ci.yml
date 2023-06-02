@@ -73,6 +73,20 @@ jobs:
         python-version: ["3.10"]
 
     steps:
+      - name: Use cassettes previously sent [PR event only]
+        run: |
+          echo "CASSETTES_MODIFIED=false" >> $GITHUB_ENV
+
+      - name: Use cassettes previously sent [PR event only]
+        run: |
+          exit 1
+
+      - name: Use cassettes previously sent [PR event only]
+        if: ${{ always() && env.CASSETTES_MODIFIED == 'true' }}
+        run: |
+          echo "ok"
+          
+
       - name: Check out repository
         uses: actions/checkout@v3
         with:
@@ -178,7 +192,7 @@ jobs:
 
 
       - name: Attempt to beat Challenges if cassettes changed [PR event only]
-        if: env.CASSETTES_MODIFIED
+        if: ${{ env.CASSETTES_MODIFIED }}
         run: |
           pytest -n auto tests/integration/challenges --beat-challenges --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term
           python tests/integration/challenges/utils/build_current_score.py
@@ -192,7 +206,7 @@ jobs:
         uses: codecov/codecov-action@v3
 
       - name: Update cassette submodule to a mirror branch [PR event only]
-        if: always() && env.CASSETTES_MODIFIED # if an error happened, we still want to update the cassettes, because it will make the next runs faster and cheaper.
+        if: always() && ${{ env.CASSETTES_MODIFIED }} # if an error happened, we still want to update the cassettes, because it will make the next runs faster and cheaper.
         run: |
           cd tests/Auto-GPT-test-cassettes
           git config --global user.name "Auto-GPT-Bot"
@@ -249,7 +263,7 @@ jobs:
           COMMENT_BODY=""
           SCORE_CHANGED_MESSAGE="The score has been updated, please merge this pull request: ${{ env.PR_URL }}"
 
-          if env.CASSETTES_MODIFIED; then
+          if ${{ env.CASSETTES_MODIFIED }}; then
             echo "Adding label and comment..."
             curl -X POST \
             -H "Authorization: Bearer $TOKEN" \
