@@ -93,6 +93,8 @@ jobs:
         name: Push updated cassettes
         run: |
           cd tests/Auto-GPT-test-cassettes
+          git remote set-url origin https://Significant-Gravitas:${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git
+
           git config --global user.name "Auto-GPT-Bot"
           git config --global user.email "github-bot@agpt.co"
           
@@ -102,5 +104,4 @@ jobs:
           git add .
           git commit -m "ok"
           git checkout -b test
-          git remote set-url origin https://Significant-Gravitas:${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git
           git push -f origin test
