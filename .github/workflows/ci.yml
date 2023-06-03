@@ -89,80 +89,18 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           submodules: true
 
-      - id: setup_git_auth
-        name: Set up git token authentication
-        run: |
-
-      - name: Push updated challenge scores
-        if: github.event_name == 'push'
-        run: |
-          score_file="tests/integration/challenges/current_score.json"
-
-          if ! git diff --quiet $score_file; then
-            git add $score_file
-            git commit -m "Update challenge scores"
-            git push origin HEAD:${{ github.ref }}
-          else
-            echo "The challenge scores didn't change."
-          fi
-
       - id: push_cassettes
         name: Push updated cassettes
         run: |
-          if [[ "${{ startsWith(github.event_name, 'pull_request') }}" = "true" ]]; then
-            is_pull_request=true
-            cassette_branch="${{ github.event.pull_request.user.login }}-${{ github.event.pull_request.head.ref }}"
-            cassette_source_branch="${{ steps.checkout_cassettes.outputs.cassette_branch }}"
-            base_branch="${{ github.event.pull_request.base.ref }}"
-          else
-            current_branch=$(echo ${{ github.ref }} | sed -e "s/refs\/heads\///g")
-            cassette_branch=$current_branch
-          fi
-
-          git fetch origin $cassette_source_branch
-          
-          echo ${{ secrets.PAT_REVIEW }} | gh auth login --with-token
+          cd tests/Auto-GPT-test-cassettes
           git config --global user.name "Auto-GPT-Bot"
           git config --global user.email "github-bot@agpt.co"
-          cd tests/Auto-GPT-test-cassettes
-          echo "test" >> test.txt 
-          git add .
-          git commit -m "ok"
-          git push -f origin HEAD:$cassette_branch
 
-          # Commit & push changes to cassettes if any
-          if ! git diff-index --quiet $cassette_source_branch; then
-            if ! [ "$cassette_branch" = "$cassette_source_branch" ]; then
-              git checkout -b $cassette_branch
-            fi
+          # Check if there are any changes
+          if ! git diff --quiet; then
             git add .
-            git commit -m "Auto-update cassettes"
-            if [ $is_pull_request ]; then
-              git push -f origin HEAD:$cassette_branch
-            else
-              git pull --rebase origin $cassette_source_branch
-              git push origin HEAD:$cassette_branch
-            fi
-
-            cd ../..
-            if [ $is_pull_request ]; then
-              git fetch origin $base_branch
-              cassette_diff=$(git diff $cassette_branch origin/$base_branch)
-            else
-              git add tests/Auto-GPT-test-cassettes
-              git commit -m "Update cassette submodule"
-              git push origin HEAD:$current_branch
-            fi
+            git commit -m "Auto-update cassettes after PR #${{ github.event.pull_request.number }}"
+            git push -f origin HEAD:refs/heads/${{ env.MIRROR_BRANCH_SUBMODULE}}
           else
-            echo "No cassette changes to commit"
+            echo "No changes to commit"
           fi
-
-          if [ -n "$cassette_diff" ]; then
-            echo "updated=true" >> $GITHUB_OUTPUT
-          else
-            echo "updated=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Post Set up git token auth
-        run: |
-          git config --unset "${{ steps.setup_git_auth.outputs.config_key }}"
