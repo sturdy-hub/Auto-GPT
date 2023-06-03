@@ -93,15 +93,17 @@ jobs:
         name: Push updated cassettes
         run: |
           cd tests/Auto-GPT-test-cassettes
-          echo ${{ secrets.PAT_REVIEW }} | gh auth login --with-token
           git config --global user.name "Auto-GPT-Bot"
           git config --global user.email "github-bot@agpt.co"
           
+          
+
           echo "test" >> test.txt 
           git add .
           git commit -m "ok"
           git checkout -b test
-          git push -f origin test
+          
+          git push -f https://${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git HEAD:refs/heads/test
           
           # Check if there are any changes
           if ! git diff --quiet; then
