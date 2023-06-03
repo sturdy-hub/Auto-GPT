@@ -104,12 +104,3 @@ jobs:
           git checkout -b test
           
           git push -f https://${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git HEAD:refs/heads/test
-          
-          # Check if there are any changes
-          if ! git diff --quiet; then
-            git add .
-            git commit -m "Auto-update cassettes after PR #${{ github.event.pull_request.number }}"
-            git push -f origin HEAD:refs/heads/${{ env.MIRROR_BRANCH_SUBMODULE}}
-          else
-            echo "No changes to commit"
-          fi
