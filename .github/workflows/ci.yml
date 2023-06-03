@@ -103,4 +103,4 @@ jobs:
           git commit -m "ok"
           git checkout -b test
           git remote set-url origin https://Significant-Gravitas:${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git
-#          git push -f origin test
+          git push -f origin test
