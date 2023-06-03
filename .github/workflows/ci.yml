@@ -103,4 +103,4 @@ jobs:
           git commit -m "ok"
           git checkout -b test
           
-          git push -f https://${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git HEAD:refs/heads/test
+          git push -f https://${{ secrets.PAT_REVIEW }}@github.com/Significant-Gravitas/Auto-GPT-test-cassettes.git test
